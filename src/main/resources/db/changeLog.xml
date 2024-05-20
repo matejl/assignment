@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet author="matejl" id="1">
+        <createTable tableName="trader">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="taxation_type" type="smallint"/>
+            <column name="tax_rate" type="numeric(38,2)"/>
+            <column name="tax_amount" type="numeric(38,2)"/>
+        </createTable>
+        <createSequence sequenceName="trader_seq"/>
+    </changeSet>
+</databaseChangeLog>
