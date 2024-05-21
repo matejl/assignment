@@ -1,73 +1,59 @@
 # assignment
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This is a solution for assignment in Quarkus.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
-
-## Running the application in dev mode
+## Running the application
+Currently, the application was only run in a dev mode. It sets up the docker container with Postgres database, executes
+the migrations and runs the application in live mode.
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
 ./gradlew quarkusDev
 ```
+The application starts at port `8080`.
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+## Endpoints
+Application provides 3 endpoints.
 
-## Packaging and running the application
+IntelliJ Http Client example is in `./docs/workflow.http`.
 
-The application can be packaged using:
-```shell script
-./gradlew build
+There are also tests that describe the workflow.
+
+### Description of the workflow
+Although the examples are provided, the workflow is described here in more detailed form.
+
+First, a new trader needs to be created which supports taxation type either `PER_RATE` or `PER_AMOUNT`.
 ```
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./gradlew build -Dquarkus.package.jar.type=uber-jar
+POST /traders
+{
+    "taxationType": "<PER_RATE|PER_AMOUNT>",
+    "taxRate": 0.1,   // if taxationType=PER_RATE
+    "taxAmount": 10   // if taxationType=PER_AMOUNT
+}
 ```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./gradlew build -Dquarkus.native.enabled=true
+It returns like the following:
 ```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true
+{
+  "id": 1,
+  "taxationType": "PER_RATE",
+  "taxRate": 10,
+  "taxAmount": null
+}
 ```
 
-You can then execute your native executable with: `./build/assignment-1.0.0-SNAPSHOT-runner`
+Then, to calculate the taxation, the following endpoints are provided for general taxation and winnings:
+```
+GET /taxations/general?traderId=<traderId>&playedAmount=<amount>&odd=<odd>
+```
+```
+GET /taxations/winnings?traderId=<traderId>&playedAmount=<amount>&odd=<odd>
+```
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
+## Additional remarks
+This project is only intended as a demo from the coding perspective.
 
-## Related Guides
+For any live environments, at least the application settings would need to be configured accordingly.
 
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- Liquibase ([guide](https://quarkus.io/guides/liquibase)): Handle your database schema migrations with Liquibase
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+Beware that there is also no authentication at this point so it is not secure.
 
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+Of course, we are only testing happy paths in the tests. We should be adding more edge cases and unit tests.

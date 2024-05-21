@@ -1,0 +1,16 @@
+POST http://localhost:8080/traders
+Content-Type: application/json
+
+{
+    "taxationType": "PER_RATE",
+    "taxRate": 0.1
+}
+> {% client.global.set("traderId", response.body.id) %}
+
+### get general
+GET http://localhost:8080/taxations/general?traderId={{traderId}}&playedAmount=10&odd=2
+Content-Type: application/json
+
+### get winnings
+GET http://localhost:8080/taxations/winnings?traderId={{traderId}}&playedAmount=10&odd=2
+Content-Type: application/json
